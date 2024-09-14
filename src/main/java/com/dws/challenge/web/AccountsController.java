@@ -7,7 +7,6 @@ import com.dws.challenge.exception.TransferAmountException;
 import com.dws.challenge.service.AccountsService;
 import com.dws.challenge.service.EmailNotificationService;
 import com.dws.challenge.service.NotificationService;
-import com.dws.challenge.validation.TransferValidation;
 
 import lombok.extern.slf4j.Slf4j;
 
