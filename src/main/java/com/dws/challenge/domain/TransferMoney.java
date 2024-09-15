@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -26,6 +27,7 @@ public class TransferMoney {
 	private final String accountToId;
 	
 	@NotNull
+	@Positive(message = "Amount must be positive")
 	private final BigDecimal amount;
 	
 	@JsonCreator

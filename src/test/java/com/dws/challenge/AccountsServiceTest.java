@@ -16,6 +16,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.dws.challenge.domain.Account;
 import com.dws.challenge.domain.TransferMoney;
+import com.dws.challenge.domain.TransferResponse;
 import com.dws.challenge.exception.DuplicateAccountIdException;
 import com.dws.challenge.exception.InvalidAccountIdException;
 import com.dws.challenge.exception.TransferAmountException;
@@ -71,10 +72,10 @@ class AccountsServiceTest {
       
 
       // Act
-      String result = accountsService.transferAmount(transferMoney, notificationService);
+      TransferResponse result = accountsService.transferAmount(transferMoney, notificationService);
 
       // Assert
-      assertEquals(" INR 200 has been Transfered from AccountId: Id-123 towards Account Id: Id-456", result);
+      assertEquals("Success", result.getStatus());
      
   }
   

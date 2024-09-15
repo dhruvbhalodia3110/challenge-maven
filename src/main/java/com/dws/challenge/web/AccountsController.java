@@ -2,6 +2,7 @@ package com.dws.challenge.web;
 
 import com.dws.challenge.domain.Account;
 import com.dws.challenge.domain.TransferMoney;
+import com.dws.challenge.domain.TransferResponse;
 import com.dws.challenge.exception.DuplicateAccountIdException;
 import com.dws.challenge.exception.TransferAmountException;
 import com.dws.challenge.service.AccountsService;
@@ -52,24 +53,15 @@ public class AccountsController {
   }
   
   
-  @PostMapping(path = "/transfer" , consumes = MediaType.APPLICATION_JSON_VALUE)
+  @PostMapping(path = "/transactions" , consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Object> transferMoney(@RequestBody @Valid TransferMoney transferMoney) {
     log.info("Transfer Money {}", transferMoney);
-    BigDecimal  zero = new BigDecimal(0);
-    String transferNotification = null;
     
-    try {
-    if (!(transferMoney.getAmount().compareTo(zero) == 1)) { 
-        throw new TransferAmountException("Transfer Amount cannot be less then 0");
-    } 
     NotificationService emailNotification = new EmailNotificationService();
     
-    transferNotification = accountsService.transferAmount(transferMoney,emailNotification);
-    }catch (Exception transExp) {
-        return new ResponseEntity<>(transExp.getMessage(), HttpStatus.BAD_REQUEST);
-      }
+    TransferResponse transferResponse = accountsService.transferAmount(transferMoney,emailNotification);
 
-    return new ResponseEntity<>(transferNotification,HttpStatus.OK);
+    return new ResponseEntity<>(transferResponse,HttpStatus.CREATED);
   }
 
   @GetMapping(path = "/{accountId}")

@@ -1,17 +1,19 @@
 package com.dws.challenge.repository;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import org.springframework.stereotype.Repository;
+
 import com.dws.challenge.domain.Account;
 import com.dws.challenge.domain.TransferMoney;
+import com.dws.challenge.domain.TransferResponse;
 import com.dws.challenge.exception.DuplicateAccountIdException;
 import com.dws.challenge.exception.InvalidAccountIdException;
 import com.dws.challenge.exception.TransferAmountException;
 import com.dws.challenge.service.NotificationService;
-
-import org.springframework.stereotype.Repository;
-
-import java.math.BigDecimal;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
 public class AccountsRepositoryInMemory implements AccountsRepository {
@@ -39,7 +41,7 @@ public class AccountsRepositoryInMemory implements AccountsRepository {
     }
 
 	@Override
-	public  String transferAmount(TransferMoney transferMoney, NotificationService notifyService) {
+	public  TransferResponse transferAmount(TransferMoney transferMoney, NotificationService notifyService) {
 		BigDecimal transferAmount = transferMoney.getAmount();
 		Account fromAccount = accounts.get(transferMoney.getAccountFromId());
 		Account toAccount = accounts.get(transferMoney.getAccountToId());
@@ -51,8 +53,12 @@ public class AccountsRepositoryInMemory implements AccountsRepository {
 		        throw new InvalidAccountIdException("Account To ID");
 		    }
 		    
-		    synchronized (fromAccount) {
-		        synchronized (toAccount) {
+		 
+		    Account firstLock = fromAccount.getAccountId().compareTo(toAccount.getAccountId()) < 0 ? fromAccount : toAccount;
+		    Account secondLock = fromAccount.getAccountId().compareTo(toAccount.getAccountId()) < 0 ? toAccount : fromAccount;
+		    
+		    synchronized (firstLock) {
+		        synchronized (secondLock) {
 		            if (fromAccount.getBalance().compareTo(transferAmount) < 0) {
 		                throw new TransferAmountException("Insufficient balance to transfer the amount");
 		            }
@@ -74,7 +80,16 @@ public class AccountsRepositoryInMemory implements AccountsRepository {
 		    }
 		
 		
-		return " INR "+ transferAmount +" has been Transfered from AccountId: "+ fromAccount.getAccountId() +" towards Account Id: "+toAccount.getAccountId();
+		return mapResponse(transferMoney,"Success") ;
+	}
+	
+	
+	
+	public TransferResponse mapResponse (TransferMoney transferMoney, String status) {
+		
+		return TransferResponse.builder().amount(transferMoney.getAmount()).status(status).fromAccount(transferMoney.getAccountFromId()).toAccount(transferMoney.getAccountToId()).
+		timestamp(LocalDateTime.now()).build();
+		
 	}
 
 }

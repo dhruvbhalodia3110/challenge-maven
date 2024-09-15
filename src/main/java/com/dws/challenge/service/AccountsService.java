@@ -2,6 +2,7 @@ package com.dws.challenge.service;
 
 import com.dws.challenge.domain.Account;
 import com.dws.challenge.domain.TransferMoney;
+import com.dws.challenge.domain.TransferResponse;
 import com.dws.challenge.repository.AccountsRepository;
 import lombok.Getter;
 import lombok.Setter;
@@ -30,7 +31,7 @@ public class AccountsService {
     return this.accountsRepository.getAccount(accountId);
   }
   
-  public String transferAmount(TransferMoney transferMoney,NotificationService notifyService) {
+  public TransferResponse transferAmount(TransferMoney transferMoney,NotificationService notifyService) {
 	    return this.accountsRepository.transferAmount(transferMoney, notifyService);
 	  }
 }
